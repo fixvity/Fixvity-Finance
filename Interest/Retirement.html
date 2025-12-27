@@ -3,261 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Advanced Retirement Calculator</title>
+<title>World-Class Retirement Calculator</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 :root{
-  --bg:#f5f8fb;
-  --card:#ffffff;
-  --primary:#1f6fb6;
-  --success:#0f9d58;
-  --warning:#d93025;
-  --text:#1c1f21;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --radius:14px;
-  --shadow:0 10px 30px rgba(0,0,0,.07);
+  --bg:#f3f6fb;--card:#fff;--primary:#2563eb;
+  --success:#16a34a;--danger:#dc2626;
+  --text:#0f172a;--muted:#64748b;--border:#e5e7eb;
+  --radius:18px;--shadow:0 20px 40px rgba(0,0,0,.08);
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,Arial;
-  background:var(--bg);
-  color:var(--text);
-}
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:16px;
-}
-h1{
-  text-align:center;
-  color:var(--primary);
-  margin-bottom:20px;
-}
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:22px;
-}
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:18px;
-}
-label{
-  display:block;
-  margin-top:12px;
-  font-size:14px;
-}
-input,select{
-  width:100%;
-  padding:11px;
-  margin-top:4px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  font-size:15px;
-}
-button{
-  width:100%;
-  margin-top:18px;
-  padding:15px;
-  font-size:17px;
-  background:var(--primary);
-  color:#fff;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-}
-.big{
-  font-size:24px;
-  font-weight:700;
-  color:var(--primary);
-}
-.box{
-  margin-top:14px;
-  padding:14px;
-  border-radius:10px;
-  background:#f9fafb;
-  border:1px solid var(--border);
-}
-.good{border-left:5px solid var(--success)}
-.bad{border-left:5px solid var(--warning)}
-.tip{
-  margin-top:8px;
-  font-size:14px;
-  color:var(--muted);
-}
+body{margin:0;font-family:Inter,system-ui;background:var(--bg);color:var(--text)}
+.container{max-width:1200px;margin:auto;padding:18px}
+h1{text-align:center;color:var(--primary)}
+.grid{display:grid;grid-template-columns:1fr 1.3fr;gap:24px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+label{font-size:14px;margin-top:14px;display:block}
+input,select{width:100%;padding:12px;margin-top:6px;border:1px solid var(--border);border-radius:10px}
+button{width:100%;margin-top:16px;padding:15px;font-size:16px;background:var(--primary);color:#fff;border:none;border-radius:14px}
+.summary{padding:18px;border-radius:14px;margin-bottom:18px}
+.good{background:#ecfdf5;border-left:6px solid var(--success)}
+.bad{background:#fef2f2;border-left:6px solid var(--danger)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.stat{background:#f8fafc;padding:14px;border-radius:12px;text-align:center}
+.stat .value{font-size:22px;font-weight:700;color:var(--primary)}
+.stat .label{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{border:1px solid var(--border);padding:10px;text-align:center}
+th{background:#f1f5f9}
 canvas{margin-top:24px}
-footer{
-  margin-top:16px;
-  font-size:13px;
-  color:var(--muted);
-}
-.sticky{
-  display:none;
-}
-@media(max-width:900px){
-  .grid{grid-template-columns:1fr}
-  .sticky{
-    display:block;
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    padding:12px;
-    background:#fff;
-    box-shadow:0 -5px 15px rgba(0,0,0,.1);
-  }
-}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 
 <body>
-<div class="container">
-<h1>Advanced Retirement Calculator</h1>
+<div class="container" id="report">
+
+<h1>Retirement Calculator</h1>
 
 <div class="grid">
 
-<!-- INPUT CARD -->
+<!-- INPUT -->
 <div class="card">
-<label>Current Age</label>
-<input id="age" value="30">
-
-<label>Retirement Age</label>
-<input id="retire" value="60">
-
-<label>Life Expectancy</label>
-<input id="life" value="85">
-
-<label>Current Savings</label>
-<input id="savings" value="20000">
-
-<label>Monthly Contribution</label>
-<input id="monthly" value="500">
-
-<label>Expected Annual Return (%)</label>
-<input id="rate" value="7">
-
-<label>Inflation (%)</label>
-<input id="inflation" value="3">
-
-<label>Monthly Expenses After Retirement</label>
-<input id="expense" value="2000">
-
+<label>Current Age</label><input id="age" value="30">
+<label>Retirement Age</label><input id="retire" value="60">
+<label>Life Expectancy</label><input id="life" value="85">
+<label>Current Savings</label><input id="savings" value="20000">
+<label>Monthly Contribution</label><input id="monthly" value="500">
+<label>Annual Return (%)</label><input id="rate" value="7">
+<label>Inflation (%)</label><input id="inflation" value="3">
+<label>Monthly Expenses After Retirement</label><input id="expense" value="2000">
 <label>Currency</label>
 <select id="currency">
-  <option value="$">$ USD</option>
-  <option value="€">€ EUR</option>
-  <option value="₹">₹ INR</option>
+<option value="$">$ USD</option>
+<option value="€">€ EUR</option>
+<option value="₹">₹ INR</option>
 </select>
 
 <button onclick="calculate()">Calculate</button>
+<button onclick="exportPDF()">Download PDF</button>
 </div>
 
-<!-- OUTPUT CARD -->
+<!-- OUTPUT -->
 <div class="card">
 
-<div>Total Savings at Retirement</div>
-<div class="big" id="total">—</div>
+<div id="summary" class="summary"></div>
 
-<div style="margin-top:10px">Funds Will Last</div>
-<div class="big" id="lasting">—</div>
-
-<div id="verdict" class="box"></div>
-
-<div class="box">
-<strong>Assumptions</strong>
-<div class="tip">
-• Inflation-adjusted returns<br>
-• Annual withdrawals for expenses<br>
-• Compared with 4% retirement withdrawal guideline
+<div class="stats">
+  <div class="stat"><div class="value" id="total"></div><div class="label">Savings at Retirement</div></div>
+  <div class="stat"><div class="value" id="years"></div><div class="label">Years Money Lasts</div></div>
 </div>
-</div>
+
+<h3>Scenario Comparison</h3>
+<table>
+<tr>
+<th>Scenario</th>
+<th>Return</th>
+<th>Savings at Retirement</th>
+<th>Years Last</th>
+</tr>
+<tbody id="scenarios"></tbody>
+</table>
 
 <canvas id="growth"></canvas>
-<canvas id="retirement"></canvas>
-
-<footer>
-This calculator provides estimates for educational purposes only and does not constitute financial advice.
-</footer>
 
 </div>
 </div>
-</div>
-
-<div class="sticky">
-<button onclick="calculate()">Calculate</button>
 </div>
 
 <script>
-let gChart,rChart;
+let chart;
 
 function money(x){
-  return currency.value +
-    Number(x).toLocaleString(undefined,{maximumFractionDigits:0});
+ return currency.value+Number(x).toLocaleString(undefined,{maximumFractionDigits:0});
+}
+
+function simulate(returnRate){
+ let a=+age.value,r=+retire.value,l=+life.value;
+ let bal=+savings.value;
+ let annual=+monthly.value*12;
+ let inf=+inflation.value/100;
+ let exp=+expense.value*12;
+ let real=(1+returnRate)/(1+inf)-1;
+
+ for(let i=a;i<r;i++) bal=bal*(1+returnRate)+annual;
+
+ let yrs=0,tmp=bal;
+ for(let i=r;i<l;i++){
+  tmp=tmp*(1+real)-exp;
+  if(tmp<=0) break;
+  yrs++;
+ }
+ return {bal,yrs};
 }
 
 function calculate(){
-  const a=+age.value, r=+retire.value, l=+life.value;
-  let bal=+savings.value;
-  const annual=+monthly.value*12;
-  const rateR=+rate.value/100;
-  const inf=+inflation.value/100;
-  const exp=+expense.value*12;
+ let base=simulate(+rate.value/100);
+ let opt=simulate((+rate.value+2)/100);
+ let con=simulate((+rate.value-2)/100);
 
-  const real=(1+rateR)/(1+inf)-1;
+ total.innerHTML=money(base.bal);
+ years.innerHTML=base.yrs+" yrs";
 
-  let grow=[],labels=[];
-  for(let i=a;i<r;i++){
-    bal=bal*(1+rateR)+annual;
-    grow.push(bal);
-    labels.push("Age "+(i+1));
+ summary.className="summary "+(base.yrs>=life.value-retire.value?"good":"bad");
+ summary.innerHTML=base.yrs>=life.value-retire.value
+  ?"✅ You are on track for retirement."
+  :"⚠️ Retirement shortfall detected.";
+
+ scenarios.innerHTML=`
+ <tr><td>Base</td><td>${rate.value}%</td><td>${money(base.bal)}</td><td>${base.yrs}</td></tr>
+ <tr><td>Optimistic</td><td>${+rate.value+2}%</td><td>${money(opt.bal)}</td><td>${opt.yrs}</td></tr>
+ <tr><td>Conservative</td><td>${+rate.value-2}%</td><td>${money(con.bal)}</td><td>${con.yrs}</td></tr>
+ `;
+
+ if(chart)chart.destroy();
+ chart=new Chart(growth,{
+  type:"line",
+  data:{
+   labels:["Base","Optimistic","Conservative"],
+   datasets:[{label:"Savings at Retirement",
+   data:[base.bal,opt.bal,con.bal],borderWidth:2}]
   }
+ });
+}
 
-  total.innerHTML=money(bal);
-
-  let years=0,temp=bal;
-  let retireData=[],rLabels=[];
-  for(let i=r;i<l;i++){
-    temp=temp*(1+real)-exp;
-    if(temp<=0) break;
-    retireData.push(temp);
-    rLabels.push("Age "+(i+1));
-    years++;
-  }
-
-  lasting.innerHTML=years+" years";
-
-  let verdictBox=document.getElementById("verdict");
-  if(years >= (l-r)){
-    verdictBox.className="box good";
-    verdictBox.innerHTML=
-      "<strong>✅ You are on track for retirement.</strong><br>" +
-      "Your projected savings can support your lifestyle through life expectancy.";
-  }else{
-    verdictBox.className="box bad";
-    verdictBox.innerHTML=
-      "<strong>⚠️ Retirement shortfall detected.</strong><br>" +
-      "Your savings may run out early. Consider saving more, retiring later, or reducing expenses.";
-  }
-
-  if(gChart) gChart.destroy();
-  if(rChart) rChart.destroy();
-
-  gChart=new Chart(growth,{
-    type:"line",
-    data:{labels,datasets:[{label:"Savings Growth",data:grow,borderWidth:2}]}
-  });
-
-  rChart=new Chart(retirement,{
-    type:"line",
-    data:{labels:rLabels,datasets:[{label:"Balance After Retirement",data:retireData,borderWidth:2}]}
-  });
+function exportPDF(){
+ html2pdf().set({
+  margin:10,
+  filename:"Retirement-Plan.pdf",
+  html2canvas:{scale:2},
+  jsPDF:{unit:"mm",format:"a4"}
+ }).from(document.getElementById("report")).save();
 }
 </script>
+
 </body>
 </html>
