@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Retirement Calculator – Plan Your Future</title>
+<title>Retirement Calculator – Advanced Planning</title>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -19,7 +18,6 @@
   --radius:12px;
   --shadow:0 10px 30px rgba(0,0,0,.06);
 }
-
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -27,121 +25,78 @@ body{
   background:var(--bg);
   color:var(--text);
 }
-
 .container{
   max-width:1200px;
   margin:auto;
   padding:16px;
 }
-
-h1{
-  text-align:center;
-  color:var(--primary);
-  margin-bottom:20px;
-}
-
+h1{text-align:center;color:var(--primary)}
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:20px;
 }
-
 .card{
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   padding:16px;
 }
-
-.card h2{
-  margin-top:0;
-  font-size:18px;
-  border-bottom:1px solid var(--border);
-  padding-bottom:8px;
-}
-
-label{
-  font-size:14px;
-  margin-top:12px;
-  display:block;
-}
-
+label{display:block;margin-top:12px;font-size:14px}
 input,select{
   width:100%;
   padding:10px;
   margin-top:4px;
   border:1px solid var(--border);
   border-radius:8px;
-  font-size:15px;
 }
-
 button{
-  width:100%;
   margin-top:16px;
+  width:100%;
   padding:14px;
-  font-size:16px;
   background:var(--primary);
   color:#fff;
   border:none;
   border-radius:10px;
-  cursor:pointer;
-}
-
-button:hover{opacity:.95}
-
-.result{
   font-size:16px;
-  margin:10px 0;
 }
-
-.big{
-  font-size:22px;
-  font-weight:700;
-  color:var(--primary);
-}
-
-canvas{margin-top:20px}
-
-@media(max-width:900px){
-  .grid{grid-template-columns:1fr}
-}
+.big{font-size:22px;font-weight:700;color:var(--primary)}
+canvas{margin-top:24px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 
 <body>
 <div class="container">
-
-<h1>Retirement Calculator</h1>
+<h1>Advanced Retirement Calculator</h1>
 
 <div class="grid">
 
-<!-- INPUTS -->
+<!-- INPUT -->
 <div class="card">
-<h2>Personal & Financial Details</h2>
-
 <label>Current Age</label>
-<input id="currentAge" type="number" value="30">
+<input id="age" value="30">
 
 <label>Retirement Age</label>
-<input id="retireAge" type="number" value="60">
+<input id="retire" value="60">
 
 <label>Life Expectancy</label>
-<input id="lifeAge" type="number" value="85">
+<input id="life" value="85">
 
 <label>Current Savings</label>
-<input id="savings" type="number" value="20000">
+<input id="savings" value="20000">
 
 <label>Monthly Contribution</label>
-<input id="monthly" type="number" value="500">
+<input id="monthly" value="500">
 
-<label>Expected Annual Return (%)</label>
-<input id="returnRate" type="number" step="0.1" value="7">
+<label>Annual Return (%)</label>
+<input id="rate" value="7">
 
-<label>Inflation Rate (%)</label>
-<input id="inflation" type="number" step="0.1" value="3">
+<label>Inflation (%)</label>
+<input id="inflation" value="3">
 
 <label>Monthly Expenses After Retirement</label>
-<input id="expenses" type="number" value="2000">
+<input id="expense" value="2000">
 
 <label>Currency</label>
 <select id="currency">
@@ -150,93 +105,97 @@ canvas{margin-top:20px}
   <option value="₹">₹ INR</option>
 </select>
 
-<button onclick="calculate()">Calculate Retirement</button>
+<button onclick="calculate()">Calculate</button>
 </div>
 
-<!-- RESULTS -->
+<!-- OUTPUT -->
 <div class="card">
-<h2>Results</h2>
+<div>Total Savings at Retirement</div>
+<div class="big" id="total">—</div>
 
-<div class="result">Total Retirement Savings:
-  <div class="big" id="totalSavings">—</div>
-</div>
+<div style="margin-top:10px">Funds Will Last</div>
+<div class="big" id="lasting">—</div>
 
-<div class="result">Monthly Retirement Income:
-  <div class="big" id="monthlyIncome">—</div>
-</div>
-
-<div class="result">Funds Will Last:
-  <div class="big" id="yearsLast">—</div>
-</div>
-
-<canvas id="growthChart"></canvas>
+<canvas id="growth"></canvas>
+<canvas id="retirement"></canvas>
+<canvas id="pie"></canvas>
 </div>
 
 </div>
 </div>
 
 <script>
-let chart;
+let c1,c2,c3;
 
-function formatMoney(val){
-  const cur=document.getElementById("currency").value;
-  return cur + Number(val).toLocaleString(undefined,{maximumFractionDigits:0});
+function money(x){
+  return document.getElementById("currency").value +
+    Number(x).toLocaleString(undefined,{maximumFractionDigits:0});
 }
 
 function calculate(){
-  const age=+currentAge.value;
-  const retire=+retireAge.value;
-  const life=+lifeAge.value;
-  const savings0=+savings.value;
-  const monthly=+monthly.value;
-  const r=+returnRate.value/100;
-  const inf=+inflation.value/100;
-  const expenses=+expenses.value;
+  const age=+ageEl.value;
+  const retire=+retireEl.value;
+  const life=+lifeEl.value;
+  let bal=+saveEl.value;
+  const monthly=+monEl.value*12;
+  const r=+rateEl.value/100;
+  const inf=+infEl.value/100;
+  const exp=+expEl.value*12;
 
-  const yearsToRetire=retire-age;
-  let balance=savings0;
-  let data=[];
-  let labels=[];
+  const real=(1+r)/(1+inf)-1;
 
-  for(let i=1;i<=yearsToRetire;i++){
-    balance = balance*(1+r) + monthly*12;
-    data.push(balance);
-    labels.push("Age "+(age+i));
+  let grow=[],labels=[],contri=0,interest=0;
+
+  for(let i=age;i<retire;i++){
+    let before=bal;
+    bal=bal*(1+r)+monthly;
+    interest+=bal-before-monthly;
+    contri+=monthly;
+    grow.push(bal);
+    labels.push("Age "+(i+1));
   }
 
-  const totalSavings=balance;
+  totalEl.innerHTML=money(bal);
 
-  const realReturn=(1+r)/(1+inf)-1;
-  const yearsAfter=life-retire;
-  let annualIncome=(totalSavings*realReturn);
-  let monthlyIncome=annualIncome/12;
+  let retireBal=[],rLabels=[],years=0;
+  let temp=bal;
+  for(let i=retire;i<life;i++){
+    temp=temp*(1+real)-exp;
+    if(temp<=0) break;
+    retireBal.push(temp);
+    rLabels.push("Age "+(i+1));
+    years++;
+  }
 
-  let lasts=Math.min(yearsAfter, totalSavings/(expenses*12));
+  lastingEl.innerHTML=years+" years";
 
-  totalSavingsEl.innerHTML=formatMoney(totalSavings);
-  monthlyIncomeEl.innerHTML=formatMoney(monthlyIncome);
-  yearsLastEl.innerHTML=Math.floor(lasts)+" years";
+  if(c1) c1.destroy();
+  if(c2) c2.destroy();
+  if(c3) c3.destroy();
 
-  if(chart) chart.destroy();
-  chart=new Chart(growthChart,{
+  c1=new Chart(growth,{
     type:"line",
+    data:{labels,datasets:[{label:"Savings Growth",data:grow,borderWidth:2}]}
+  });
+
+  c2=new Chart(retirement,{
+    type:"line",
+    data:{labels:rLabels,datasets:[{label:"Balance After Retirement",data:retireBal,borderWidth:2}]}
+  });
+
+  c3=new Chart(pie,{
+    type:"pie",
     data:{
-      labels:labels,
-      datasets:[{
-        label:"Savings Growth",
-        data:data,
-        borderWidth:2,
-        fill:false
-      }]
-    },
-    options:{responsive:true}
+      labels:["Contributions","Interest"],
+      datasets:[{data:[contri,interest]}]
+    }
   });
 }
 
-const totalSavingsEl=document.getElementById("totalSavings");
-const monthlyIncomeEl=document.getElementById("monthlyIncome");
-const yearsLastEl=document.getElementById("yearsLast");
+const ageEl=age,retireEl=retire,lifeEl=life,
+saveEl=savings,monEl=monthly,rateEl=rate,
+infEl=inflation,expEl=expense,
+totalEl=total,lastingEl=lasting;
 </script>
-
 </body>
 </html>
